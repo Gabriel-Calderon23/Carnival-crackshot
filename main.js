@@ -1,4 +1,4 @@
-import HelloWorldScene from "./scenes/HelloWorldScene.js";
+import HelloWorldScene from "./scenes/game.js";
 
 // Create a new Phaser config object
 const config = {
@@ -22,7 +22,7 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { 0: 0 },
-      debug: true,
+      debug: false,
     },
   },
   render: {

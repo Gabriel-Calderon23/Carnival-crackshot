@@ -29,20 +29,20 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.add.image(0, 170, "carril").setOrigin(0);
     this.add.image(0, 340, "carril").setOrigin(0);
 
-    // Cartuchos
     this.cartuchos = [];
     this.recargarCartuchos();
 
-  
     this.add.image(0, 0, "tiket").setOrigin(0);
     this.add.image(0, 0, "escopeta").setOrigin(0);
 
-    const cartuchoX = 20;
+    const cartuchoX = 0;
     const cartuchoY = 520;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       let cartucho = this.add.image(cartuchoX + i * 40, cartuchoY, "cartucho").setOrigin(0);
       this.cartuchos.push(cartucho);
     }
+
+    this.cartuchos.forEach(c => c.x -= 55);
 
     this.ronda = 1;
     this.patosAcertados = 0;
@@ -60,13 +60,19 @@ export default class HelloWorldScene extends Phaser.Scene {
       fill: '#ffffff'
     });
 
-    this.iniciarRonda();
-
     this.puntero = this.add.image(400, 300, "puntero").setOrigin(0.5);
     this.puntero.setDepth(1000);
     this.input.setDefaultCursor('none');
 
     this.input.on("pointerdown", this.disparar, this);
+
+    this.input.keyboard.on('keydown-R', () => {
+      this.scene.start('inicio');
+    });
+
+    this.patosMuertos = 0;
+
+    this.iniciarRonda();
   }
 
   recargarCartuchos() {
@@ -77,36 +83,43 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     const cartuchoX = 20;
     const cartuchoY = 0;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       let cartucho = this.add.image(cartuchoX + i * 40, cartuchoY, "cartucho").setOrigin(0);
       this.cartuchos.push(cartucho);
     }
+
+    this.cartuchos.forEach(c => c.x -= 55);
   }
 
   iniciarRonda() {
     this.patosAcertados = 0;
+    this.patosMuertos = 0;
     this.patos.clear(true, true);
     this.recargarCartuchos();
 
+    this.maxPatos = 10;
+    this.aciertosNecesarios = 8;
+
     this.patosCreados = 0;
-    this.maxPatos = 8;
     this.carrilesY = [120, 280, 500];
 
     this.textoRonda.setText(`Ronda: ${this.ronda}`);
 
+    this.add.image(0, 0, "cortina").setOrigin(0).setDepth(999);
+
+    const repeticiones = Math.ceil(this.maxPatos / 2);
     this.timedEvent = this.time.addEvent({
-      delay: 3000,
-      repeat: 3,
+      delay: 2000,
+      repeat: repeticiones - 1,
       callback: () => {
         this.crearParejaPatos();
       }
     });
-
-    
   }
 
   crearParejaPatos() {
-    let indices = Phaser.Utils.Array.Shuffle([ 1, 2]);
+    let indices = Phaser.Utils.Array.Shuffle([1, 2]);
+
     for (let j = 0; j < 2 && this.patosCreados < this.maxPatos; j++) {
       const lado = Phaser.Math.Between(0, 1);
       const x = lado === 0 ? this.limiteIzquierdo : this.limiteDerecho;
@@ -122,18 +135,15 @@ export default class HelloWorldScene extends Phaser.Scene {
       pato.body.setAllowGravity(false);
       pato.flipX = direccion === -1;
 
+      pato.on('destroy', () => {
+        this.patosMuertos++;
+        if (this.patosMuertos >= this.maxPatos) {
+          this.terminarRonda();
+        }
+      });
+
       this.patosCreados++;
     }
-
-    if (this.patosCreados >= this.maxPatos) {
-      this.time.delayedCall(6000, () => this.terminarRonda(), [], this); // Espera 6 segundos en vez de 12
-    }
-
-
-    this.add.image(0, 0, "cortina").setOrigin(0);
-
-
-
   }
 
   disparar(pointer) {
@@ -143,7 +153,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     cartucho.destroy();
 
     this.patos.children.iterate((pato) => {
-      if (!pato.getData('vivo')) return;
+      if (!pato || !pato.getData('vivo')) return;
+
       let bounds = pato.getBounds();
       if (
         pointer.worldX >= bounds.x &&
@@ -156,17 +167,16 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.patosAcertados++;
         this.puntaje += 500;
         this.textoPuntaje.setText(`Puntaje: ${this.puntaje}`);
-        return false;
       }
     });
   }
 
   terminarRonda() {
-    if (this.patosAcertados >= 6) {
+    if (this.patosAcertados >= this.aciertosNecesarios) {
       this.ronda++;
       this.iniciarRonda();
     } else {
-      this.scene.start('gameover', { puntaje: this.puntaje }); // Usa el puntaje real
+      this.scene.start('gameover', { puntaje: this.puntaje });
     }
   }
 
@@ -178,10 +188,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (!this.patos) return;
 
     this.patos.children.iterate((pato) => {
-      if (!pato.getData('vivo')) return;
+      if (!pato || !pato.getData('vivo')) return;
 
       let direccion = pato.getData('direccion');
-      pato.x += direccion * 5; 
+      let velocidad = 5 + Math.floor((this.ronda - 1) / 2) * 0.5;
+      pato.x += direccion * velocidad;
 
       if (pato.x < this.limiteIzquierdo) {
         pato.setData('direccion', 1);
