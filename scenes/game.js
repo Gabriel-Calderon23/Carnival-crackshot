@@ -16,6 +16,10 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("cartucho", "./public/assets/cartucho.png");
     this.load.image("puntero", "./public/assets/puntero.png");
     this.load.image("pato", "./public/assets/pato.png");
+    this.load.audio("disparo", "./public/musica/disparo.mp3");
+    this.load.audio("pato", "./public/musica/pato.mp3");
+ 
+
   }
 
   create() {
@@ -28,6 +32,10 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.add.image(0, -40, "carril").setOrigin(0);
     this.add.image(0, 170, "carril").setOrigin(0);
     this.add.image(0, 340, "carril").setOrigin(0);
+
+
+  
+    
 
     this.cartuchos = [];
     this.recargarCartuchos();
@@ -149,6 +157,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   disparar(pointer) {
     if (this.cartuchos.length === 0) return;
 
+    this.sound.play("disparo", { volume: 0.4 });// <<< sonido del disparo
+
     let cartucho = this.cartuchos.pop();
     cartucho.destroy();
 
@@ -161,7 +171,11 @@ export default class HelloWorldScene extends Phaser.Scene {
         pointer.worldX <= bounds.x + bounds.width &&
         pointer.worldY >= bounds.y &&
         pointer.worldY <= bounds.y + bounds.height
+
       ) {
+
+        this.sound.play("pato", { volume: 0.5 });
+
         pato.setData('vivo', false);
         pato.destroy();
         this.patosAcertados++;
