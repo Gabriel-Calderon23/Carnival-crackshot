@@ -8,9 +8,8 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   preload() {
     this.load.image("fondo", "./public/assets/inicio.png");
-    this.load.image("marco", "./public/assets/marco.png");
+    this.load.image("escenario", "./public/assets/ecenario.png");
     this.load.image("carril", "./public/assets/carril.png");
-    this.load.image("cortina", "./public/assets/cortina.png");
     this.load.image("tiket", "./public/assets/tiket.png");
     this.load.image("escopeta", "./public/assets/escopeta.png");
     this.load.image("cartucho", "./public/assets/cartucho.png");
@@ -28,10 +27,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.limiteDerecho = this.anchoPantalla + 60;
 
     this.add.image(0, 0, "fondo").setOrigin(0);
-    this.add.image(0, 0, "marco").setOrigin(0);
     this.add.image(0, -40, "carril").setOrigin(0);
     this.add.image(0, 170, "carril").setOrigin(0);
     this.add.image(0, 340, "carril").setOrigin(0);
+
+    this.add.image(0, 0, "escenario").setOrigin(0).setDepth(10);
 
 
   
@@ -40,13 +40,14 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.cartuchos = [];
     this.recargarCartuchos();
 
-    this.add.image(0, 0, "tiket").setOrigin(0);
-    this.add.image(0, 0, "escopeta").setOrigin(0);
+    this.add.image(0, 0, "tiket").setOrigin(0).setDepth(20);
+    this.add.image(0, 0, "escopeta").setOrigin(0).setDepth(20);
 
     const cartuchoX = 0;
     const cartuchoY = 520;
     for (let i = 0; i < 10; i++) {
       let cartucho = this.add.image(cartuchoX + i * 40, cartuchoY, "cartucho").setOrigin(0);
+      cartucho.setDepth(20);
       this.cartuchos.push(cartucho);
     }
 
@@ -61,12 +62,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.textoPuntaje = this.add.text(800, 850, `Puntaje: ${this.puntaje}`, {
       fontSize: '40px',
       fill: '#ffffff'
-    });
+    }).setDepth(30);
 
     this.textoRonda = this.add.text(800, 900, `Ronda: ${this.ronda}`, {
       fontSize: '40px',
       fill: '#ffffff'
-    });
+    }).setDepth(30);
 
     this.puntero = this.add.image(400, 300, "puntero").setOrigin(0.5);
     this.puntero.setDepth(1000);
@@ -93,6 +94,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     const cartuchoY = 0;
     for (let i = 0; i < 10; i++) {
       let cartucho = this.add.image(cartuchoX + i * 40, cartuchoY, "cartucho").setOrigin(0);
+      cartucho.setDepth(20);
       this.cartuchos.push(cartucho);
     }
 
@@ -113,7 +115,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.textoRonda.setText(`Ronda: ${this.ronda}`);
 
-    this.add.image(0, 0, "cortina").setOrigin(0).setDepth(999);
+  
+
+    this.add.image(0, 0, "ecenario").setOrigin(0).setDepth(999);
 
     const repeticiones = Math.ceil(this.maxPatos / 2);
     this.timedEvent = this.time.addEvent({
