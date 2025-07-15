@@ -25,3 +25,5 @@
 - Próximamente: combos, mejoras visuales y modo móvil
 
 ## Cómo jugar
+
+https://gabriel-calderon23.github.io/Carnival-crackshot/
