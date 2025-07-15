@@ -40,7 +40,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.cartuchos = [];
     this.recargarCartuchos();
 
-    this.add.image(0, 0, "tiket").setOrigin(0).setDepth(20);
+    this.add.image(0, 0, "tiket").setOrigin(0).setDepth(20); 
     this.add.image(0, 0, "escopeta").setOrigin(0).setDepth(20);
 
     const cartuchoX = 0;
@@ -209,7 +209,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       if (!pato || !pato.getData('vivo')) return;
 
       let direccion = pato.getData('direccion');
-      let velocidad = 5 + Math.floor((this.ronda - 1) / 2) * 0.5;
+      let velocidad = 10+ Math.floor((this.ronda - 1) / 2) * 0.5;
       pato.x += direccion * velocidad;
 
       if (pato.x < this.limiteIzquierdo) {
